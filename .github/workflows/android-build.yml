@@ -22,7 +22,7 @@ jobs:
     - name: Build APK
       working-directory: ./SMSGateway-Pro
       run: |
-        gradle wrapper --gradle-version 8.0
+        gradle wrapper --gradle-version 7.6
         chmod +x gradlew
         ./gradlew clean assembleRelease
 
