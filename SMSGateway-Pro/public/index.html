@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Gateway Pro - Control Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .devices-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .device-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .device-item:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+        }
+
+        .device-item.active {
+            background: #e8eaf6;
+            border-color: #667eea;
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .device-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-badge.online {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-badge.offline {
+            background: #f44336;
+            color: white;
+        }
+
+        .device-info {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .device-phone {
+            color: #667eea;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .device-ip {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .messages-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+
+        .message-item.unread {
+            background: #e3f2fd;
+            border-color: #667eea;
+            border-left: 4px solid #667eea;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .message-from {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .message-phone {
+            font-size: 12px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .message-body {
+            color: #555;
+            line-height: 1.4;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.online {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .status-indicator.offline {
+            background: #f44336;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 8px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .connection-dot.connected {
+            background: #4CAF50;
+        }
+
+        .connection-dot.disconnected {
+            background: #f44336;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status">
+        <div class="connection-dot disconnected" id="connectionDot"></div>
+        <span id="connectionText">Desconectado</span>
+    </div>
+
+    <div class="container">
+        <header>
+            <div>
+                <h1>📱 SMS Gateway Pro</h1>
+                <p style="color: #999; font-size: 14px;">Control Center - Gerenciar 1000+ Dispositivos</p>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="totalDevices">0</div>
+                    <div class="stat-label">Dispositivos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="onlineDevices">0</div>
+                    <div class="stat-label">Online</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="totalMessages">0</div>
+                    <div class="stat-label">SMS Recebidos</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>📱 Dispositivos Conectados</h2>
+                <div class="devices-list" id="devicesList">
+                    <p style="text-align: center; color: #999;">Aguardando conexões...</p>
+                </div>
+                <div class="scroll-hint">Clique em um dispositivo para ver seus SMS</div>
+            </div>
+
+            <div class="panel">
+                <h2>💬 SMS Recebidos</h2>
+                <div class="tabs">
+                    <button class="tab-button active" onclick="filterMessages('all')">Todos</button>
+                    <button class="tab-button" onclick="filterMessages('unread')">Não Lidos</button>
+                </div>
+                <div class="messages-list" id="messagesList">
+                    <p style="text-align: center; color: #999;">Nenhuma mensagem ainda...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let allDevices = [];
+        let allMessages = [];
+        let selectedPhone = null;
+        let messageFilter = 'all';
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const host = window.location.host;
+            
+            ws = new WebSocket(`${protocol}://${host}`);
+
+            ws.onopen = () => {
+                console.log('✅ Conectado ao servidor');
+                updateConnectionStatus(true);
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'device-list') {
+                    allDevices = data.devices;
+                    updateDeviceList();
+                    updateStats();
+                } else if (data.type === 'sms') {
+                    allMessages.unshift(data.sms);
+                    updateMessageList();
+                    updateStats();
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('❌ Erro WebSocket:', error);
+                updateConnectionStatus(false);
+            };
+
+            ws.onclose = () => {
+                console.log('❌ Desconectado');
+                updateConnectionStatus(false);
+                // Reconectar após 3 segundos
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connectionDot');
+            const text = document.getElementById('connectionText');
+            
+            if (connected) {
+                dot.className = 'connection-dot connected';
+                text.textContent = 'Conectado';
+            } else {
+                dot.className = 'connection-dot disconnected';
+                text.textContent = 'Desconectado';
+            }
+        }
+
+        function updateDeviceList() {
+            const list = document.getElementById('devicesList');
+            
+            if (allDevices.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #999;">Aguardando conexões...</p>';
+                return;
+            }
+
+            list.innerHTML = allDevices.map(device => `
+                <div class="device-item ${selectedPhone === device.phoneNumber ? 'active' : ''}" 
+                     onclick="selectDevice('${device.phoneNumber}')">
+                    <div class="device-header">
+                        <div>
+                            <span class="status-indicator ${device.status}"></span>
+                            <span class="device-name">${device.deviceName}</span>
+                        </div>
+                        <span class="status-badge ${device.status}">${device.status === 'online' ? '🟢 Online' : '🔴 Offline'}</span>
+                    </div>
+                    <div class="device-phone">📞 ${device.phoneNumber}</div>
+                    <div class="device-info">
+                        <div class="device-ip">IP: ${device.ipAddress}</div>
+                        <div style="font-size: 11px; color: #aaa;">Último acesso: ${formatTime(device.lastSeen)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectDevice(phoneNumber) {
+            selectedPhone = phoneNumber;
+            updateDeviceList();
+            updateMessageList();
+        }
+
+        function updateMessageList() {
+            const list = document.getElementById('messagesList');
+            
+            let filtered = allMessages;
+            
+            if (selectedPhone) {
+                filtered = filtered.filter(msg => msg.phoneNumber === selectedPhone);
+            }
+            
+            if (messageFilter === 'unread') {
+                filtered = filtered.filter(msg => !msg.read);
+            }
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #999;">Nenhuma mensagem...</p>';
+                return;
+            }
+
+            list.innerHTML = filtered.map(msg => `
+                <div class="message-item ${!msg.read ? 'unread' : ''}">
+                    <div class="message-header">
+                        <span class="message-from">📱 ${msg.sender}</span>
+                        <span class="message-time">${formatTime(msg.timestamp)}</span>
+                    </div>
+                    <div class="message-phone">Para: ${msg.phoneNumber}</div>
+                    <div class="message-body">${escapeHtml(msg.body)}</div>
+                </div>
+            `).join('');
+        }
+
+        function filterMessages(filter) {
+            messageFilter = filter;
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            updateMessageList();
+        }
+
+        function updateStats() {
+            const totalDevices = allDevices.length;
+            const onlineDevices = allDevices.filter(d => d.status === 'online').length;
+            const totalMessages = allMessages.length;
+
+            document.getElementById('totalDevices').textContent = totalDevices;
+            document.getElementById('onlineDevices').textContent = onlineDevices;
+            document.getElementById('totalMessages').textContent = totalMessages;
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+
+            if (diff < 60000) return 'Agora';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m atrás`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h atrás`;
+            
+            return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Iniciar conexão ao carregar
+        connectWebSocket();
+
+        // Buscar dados iniciais
+        fetch('/api/devices')
+            .then(r => r.json())
+            .then(data => {
+                allDevices = data.devices;
+                updateDeviceList();
+                updateStats();
+            });
+
+        fetch('/api/messages')
+            .then(r => r.json())
+            .then(data => {
+                allMessages = data.messages;
+                updateMessageList();
+                updateStats();
+            });
+    </script>
+</body>
+</html>
