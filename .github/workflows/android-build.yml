@@ -11,24 +11,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Setup Java JDK 11
+    - name: Setup JDK 11
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
-        distribution: 'temurin'
-
-    - name: Make gradlew executable
-      run: chmod +x ${{ github.workspace }}/SMSGateway-Pro/gradlew
+        java-version: 11
+        distribution: temurin
 
     - name: Build APK
-      run: cd ${{ github.workspace }}/SMSGateway-Pro && ./gradlew assembleRelease
+      working-directory: ./SMSGateway-Pro
+      run: |
+        gradle wrapper --gradle-version 8.0
+        chmod +x gradlew
+        ./gradlew clean assembleRelease
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
-      if: success()
       with:
         name: APK
-        path: ${{ github.workspace }}/SMSGateway-Pro/app/build/outputs/apk/release/app-release.apk
+        path: SMSGateway-Pro/app/build/outputs/apk/release/app-release.apk
