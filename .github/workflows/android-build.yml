@@ -1,4 +1,3 @@
-
 name: Build APK
  
 on:
@@ -20,14 +19,14 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     
-    - name: Build APK with Gradle Wrapper
-      run: |
-        ./gradlew clean assembleRelease --no-daemon
-      shell: bash
+    - name: Grant execute permission to gradlew
+      run: chmod +x gradlew
     
-    - name: Upload APK to Artifacts
+    - name: Build APK
+      run: ./gradlew assembleRelease
+    
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: APK
         path: app/build/outputs/apk/release/app-release.apk
- 
